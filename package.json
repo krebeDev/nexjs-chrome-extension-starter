@@ -1,27 +1,38 @@
 {
-  "name": "hello-extension",
+  "name": "nextjs-chrome-extension",
   "version": "0.1.0",
+  "author": "Solomon Ekrebe",
+  "description": "A Chrome extension starter project bootstrapped with Next.js v15.1.3 and TypeScript.",
+  "homepage": "https://github.com/solomon-ekrebe/hello-chrome-extension",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/krebeDev/nextjs-chrome-extension.git"
+  },
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "INLINE_RUNTIME_CHUNK=false next build && node scripts/post-build.js",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "next": "15.1.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "next": "15.1.3"
+    "webpack-extension-reloader": "^1.1.4"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@eslint/eslintrc": "^3",
+    "@types/chrome": "^0.0.287",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
+    "copy-webpack-plugin": "^12.0.2",
     "eslint": "^9",
     "eslint-config-next": "15.1.3",
-    "@eslint/eslintrc": "^3"
+    "or": "^0.2.0",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
   }
 }
