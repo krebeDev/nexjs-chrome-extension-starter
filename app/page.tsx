@@ -10,7 +10,11 @@ const Popup: FC = () => {
   return (
     <div className='flex flex-col items-center justify-center h-full'>
       <h1 className='text-2xl font-bold'>Hello world!</h1>
-      <button type='button' onClick={sendMessage}>
+      <button
+        type='button'
+        onClick={sendMessage}
+        className='mt-4 px-4 py-2 bg-blue-500 text-white rounded'
+      >
         Send a message
       </button>
     </div>
