@@ -2,12 +2,9 @@ const fs = require("fs");
 const path = require("path");
 
 const OUT_DIR = path.resolve(__dirname, "../out");
-const NEXT_BUILD_DIR = path.resolve(__dirname, "../.next");
 const RENAMED_DIR = path.join(OUT_DIR, "assets");
 const SCRIPTS_DIR = path.join(RENAMED_DIR, "static/scripts");
-const filesToCopy = ["background.js", "content.js"];
 
-// Utility function to traverse all files in a directory recursively
 const traverseAndReplace = (directory, searchPattern, replaceWith) => {
   const files = fs.readdirSync(directory, { withFileTypes: true });
 
@@ -29,7 +26,6 @@ const traverseAndReplace = (directory, searchPattern, replaceWith) => {
   });
 };
 
-// Utility function to extract inline scripts from HTML
 const extractInlineScripts = (htmlFile) => {
   const htmlContent = fs.readFileSync(htmlFile, "utf8");
   const scriptRegex = /<script>([\s\S]*?)<\/script>/g;
@@ -44,35 +40,28 @@ const extractInlineScripts = (htmlFile) => {
   return { htmlContent, inlineScripts };
 };
 
-// Utility function to save extracted scripts to files
-const saveScriptsToFiles = (scripts) => {
-  if (!fs.existsSync(SCRIPTS_DIR)) {
-    fs.mkdirSync(SCRIPTS_DIR, { recursive: true });
+const saveScriptsToFiles = (scripts, htmlFileName) => {
+  const htmlScriptsDir = path.join(
+    SCRIPTS_DIR,
+    htmlFileName.replace(".html", "")
+  );
+  if (!fs.existsSync(htmlScriptsDir)) {
+    fs.mkdirSync(htmlScriptsDir, { recursive: true });
   }
 
   return scripts.map((script, index) => {
     const fileName = `script-${index + 1}.js`;
-    const filePath = path.join(SCRIPTS_DIR, fileName);
+    const filePath = path.join(htmlScriptsDir, fileName);
     fs.writeFileSync(filePath, script, "utf8");
     console.log(`Saved inline script to: ${filePath}`);
-    return `/assets/static/scripts/${fileName}`;
+    return `/assets/static/scripts/${htmlFileName.replace(
+      ".html",
+      ""
+    )}/${fileName}`;
   });
 };
 
-// Step 1: Copy `background.js` and `content.js` from `.next` to `out`
-filesToCopy.forEach((file) => {
-  const sourcePath = path.join(NEXT_BUILD_DIR, file);
-  const destPath = path.join(OUT_DIR, file);
-
-  if (fs.existsSync(sourcePath)) {
-    fs.copyFileSync(sourcePath, destPath);
-    console.log(`Copied ${file} from ${sourcePath} to ${destPath}`);
-  } else {
-    console.error(`Error: ${file} not found in ${NEXT_BUILD_DIR}`);
-  }
-});
-
-// Step 2: Rename `_next` directory to `assets`
+// Rename `_next` directory to `assets`
 const NEXT_DIR = path.join(OUT_DIR, "_next");
 if (fs.existsSync(NEXT_DIR)) {
   fs.renameSync(NEXT_DIR, RENAMED_DIR);
@@ -81,27 +70,56 @@ if (fs.existsSync(NEXT_DIR)) {
   console.error(`Error: _next directory not found in ${OUT_DIR}`);
 }
 
-// Step 3: Traverse all files in `out` and replace `/next/` with `/assets/`
+// Traverse all files in `out` and replace `/next/` with `/assets/`
 traverseAndReplace(OUT_DIR, "/_next/", "/assets/");
 
-// Step 4: Extract and replace inline scripts in `index.html`
-const INDEX_HTML = path.join(OUT_DIR, "index.html");
-if (fs.existsSync(INDEX_HTML)) {
-  const { htmlContent, inlineScripts } = extractInlineScripts(INDEX_HTML);
-  const externalScriptPaths = saveScriptsToFiles(inlineScripts);
+const findHtmlFiles = (dir) => {
+  let htmlFiles = [];
+  const items = fs.readdirSync(dir);
 
-  // Replace inline scripts with external references
-  let updatedHtml = htmlContent;
-  externalScriptPaths.forEach((scriptPath, index) => {
-    updatedHtml = updatedHtml.replace(
-      /<script>([\s\S]*?)<\/script>/,
-      `<script src="${scriptPath}"></script>`
-    );
+  items.forEach((item) => {
+    const fullPath = path.join(dir, item);
+    const stat = fs.statSync(fullPath);
+
+    if (stat.isDirectory()) {
+      // Recursively search subdirectories
+      htmlFiles = htmlFiles.concat(findHtmlFiles(fullPath));
+    } else if (item.endsWith(".html")) {
+      // Store the relative path from OUT_DIR
+      htmlFiles.push(path.relative(OUT_DIR, fullPath));
+    }
   });
 
-  // Write updated HTML back to file
-  fs.writeFileSync(INDEX_HTML, updatedHtml, "utf8");
-  console.log(`Updated ${INDEX_HTML} to reference external scripts`);
-} else {
-  console.error(`Error: ${INDEX_HTML} not found`);
-}
+  return htmlFiles;
+};
+
+const processHtmlFiles = () => {
+  const htmlFiles = findHtmlFiles(OUT_DIR);
+
+  htmlFiles.forEach((htmlFile) => {
+    const htmlPath = path.join(OUT_DIR, htmlFile);
+    const { htmlContent, inlineScripts } = extractInlineScripts(htmlPath);
+
+    // Create script paths that maintain the same directory structure
+    const scriptDirName = htmlFile.replace(".html", "");
+    const externalScriptPaths = saveScriptsToFiles(
+      inlineScripts,
+      scriptDirName
+    );
+
+    // Replace inline scripts with external references
+    let updatedHtml = htmlContent;
+    externalScriptPaths.forEach((scriptPath) => {
+      updatedHtml = updatedHtml.replace(
+        /<script>([\s\S]*?)<\/script>/,
+        `<script src="${scriptPath}"></script>`
+      );
+    });
+
+    // Write updated HTML back to file
+    fs.writeFileSync(htmlPath, updatedHtml, "utf8");
+    console.log(`Updated ${htmlPath} to reference external scripts`);
+  });
+};
+
+processHtmlFiles();
