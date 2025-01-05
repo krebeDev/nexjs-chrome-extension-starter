@@ -1,4 +1,4 @@
-This is a Chrome extension starter project created with Next.js. Compliant with
+This is a Chrome extension starter project created with Next.js. It's compliant with
 the latest Chrome Extension Manifest V3.
 
 ## Getting Started
