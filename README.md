@@ -9,6 +9,10 @@ This is a Chrome extension starter project built with Next.js.
 5. Click "Load unpacked" and select the `out` directory
 6. Enjoy!
 
+## Service-worker script
+
+Note that the service-worker script aka `background.js` is currently in the `public` directory.
+
 ## Dependencies
 
 - [Next.js](https://nextjs.org/)
