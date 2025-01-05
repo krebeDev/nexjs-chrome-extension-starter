@@ -1,5 +1,5 @@
 This is a Chrome extension starter project created with Next.js. It's compliant with
-the latest Chrome Extension Manifest V3.
+the latest Chrome Extension Manifest V3 guidelines.
 
 ## Getting Started
 
