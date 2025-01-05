@@ -1,4 +1,4 @@
-This is a Chrome extension starter project built with Next.js.
+This is a Chrome extension starter project created with Next.js.
 
 ## Getting Started
 
