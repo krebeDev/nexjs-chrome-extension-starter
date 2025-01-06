@@ -1,7 +1,7 @@
 This is a Chrome extension starter project created with Next.js. It's compliant with
 the latest Chrome Extension Manifest V3 guidelines.
 
-Unless your Chrome extension has complex UI, this template is not suitable for it. It might be an overkill for simpler extensions.
+Unless your extension has complex UI, this template is not suitable for it. It might be an overkill for simpler extensions.
 
 ## Getting Started
 
