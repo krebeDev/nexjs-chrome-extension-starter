@@ -23,14 +23,6 @@ Note that the service-worker script aka `background.js` is currently in the `pub
 - [TypeScript](https://www.typescriptlang.org/)
 - [Chrome Extension Manifest V3](https://developer.chrome.com/docs/extensions/reference/manifest/)
 
-## Next Steps
-
-- [ ] Update the manifest file
-- [ ] Update the background script
-- [ ] Update the content script
-- [ ] Update the popup
-- [ ] Update the service worker
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.
